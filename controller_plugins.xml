@@ -1,0 +1,5 @@
+<library path="lib/libforce_controller">
+    <class name="operational_space_controllers/ForceControllerPlugin"
+           type="operational_space_controllers::ForceController"
+           base_class_type="pr2_controller_interface::Controller" />
+</library>
