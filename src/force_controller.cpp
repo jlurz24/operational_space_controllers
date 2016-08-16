@@ -72,12 +72,12 @@ bool ForceController::init(pr2_mechanism_model::RobotState *robot,
     J.resize(kdl_chain.getNrOfJoints());
     qdotdot.resize(kdl_chain.getNrOfJoints());
 
-    Kp.vel(0) = 24.0;
-    Kp.vel(1) = 24.0;
-    Kp.vel(2) = 24.0;
-    Kp.rot(0) = 24.0;
-    Kp.rot(1) = 24.0;
-    Kp.rot(2) = 24.0;
+    Kp.vel(0) = 32.0;
+    Kp.vel(1) = 32.0;
+    Kp.vel(2) = 32.0;
+    Kp.rot(0) = 32.0;
+    Kp.rot(1) = 32.0;
+    Kp.rot(2) = 32.0;
 
     Kd.vel(0) = 1.0;
     Kd.vel(1) = 1.0;
