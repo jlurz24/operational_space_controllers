@@ -2,8 +2,12 @@ r_arm_force_controller:
   type: operational_space_controllers/ForceControllerPlugin
   root_name: torso_lift_link
   tip_name: r_gripper_tool_frame
+  proportional_gain: 16.0
+  derivative_gain: 1.0
 
 l_arm_force_controller:
   type: operational_space_controllers/ForceControllerPlugin
   root_name: torso_lift_link
   tip_name: l_gripper_tool_frame
+  proportional_gain: 16.0
+  derivative_gain: 1.0
