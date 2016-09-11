@@ -62,6 +62,26 @@ bool ForceController::init(pr2_mechanism_model::RobotState *robot,
         ROS_INFO("Derivative gain set to %f", kd);
     }
 
+    double kpRot;
+    if (!n.getParam("proportional_gain_rotational", kpRot))
+    {
+        ROS_ERROR("No rotational proportional gain given in namespace: %s)", n.getNamespace().c_str());
+        return false;
+    }
+    else {
+        ROS_INFO("Rotational proportional gain set to %f", kpRot);
+    }
+
+    double kdRot;
+    if (!n.getParam("derivative_gain_rotational", kdRot))
+    {
+        ROS_ERROR("No rotational derivative gain given in namespace: %s)", n.getNamespace().c_str());
+        return false;
+    }
+    else {
+        ROS_INFO("Rotational derivative gain set to %f", kdRot);
+    }
+
     // Construct a chain from the root to the tip and prepare the kinematics
     // Note the joints must be calibrated
     if (!chain.init(robot, root_name, tip_name))
@@ -95,16 +115,16 @@ bool ForceController::init(pr2_mechanism_model::RobotState *robot,
     Kp.vel(0) = kp;
     Kp.vel(1) = kp;
     Kp.vel(2) = kp;
-    Kp.rot(0) = kp;
-    Kp.rot(1) = kp;
-    Kp.rot(2) = kp;
+    Kp.rot(0) = kpRot;
+    Kp.rot(1) = kpRot;
+    Kp.rot(2) = kpRot;
 
     Kd.vel(0) = kd;
     Kd.vel(1) = kd;
     Kd.vel(2) = kd;
-    Kd.rot(0) = kd;
-    Kd.rot(1) = kd;
-    Kd.rot(2) = kd;
+    Kd.rot(0) = kdRot;
+    Kd.rot(1) = kdRot;
+    Kd.rot(2) = kdRot;
 
     subscriber = n.subscribe("command", 1, &ForceController::commandCB, this);
     updates = 0;

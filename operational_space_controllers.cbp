@@ -1281,6 +1281,7 @@
 		<Unit filename="gtest/Makefile" />
 		<Unit filename="gtest/cmake_install.cmake" />
 		<Unit filename="include/operational_space_controllers/force_controller.hpp" />
+		<Unit filename="launch/force_controllers.launch" />
 		<Unit filename="launch/l_arm_force_controller.launch" />
 		<Unit filename="launch/r_arm_force_controller.launch" />
 		<Unit filename="lib/libforce_controller.so" />
