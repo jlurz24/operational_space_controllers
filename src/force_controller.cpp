@@ -17,13 +17,20 @@ static const double GAMMA = 1e4;
 void ForceController::commandCB(const operational_space_controllers_msgs::MoveConstPtr &command)
 {
     ROS_DEBUG("Force controller with kinematic chain ending at %s received a new move command", tip_name.c_str());
+
     if (command->header.frame_id != "/" + root_name)
     {
-        ROS_ERROR("Move commands must be in the %s frame. Command was in the %s frame.",
+        ROS_ERROR("Move commands must be in the %s frame. Command was in the /%s frame.",
                   root_name.c_str(), command->header.frame_id.c_str());
         return;
     }
-    move_command.set(command);
+
+    if (command->stop) {
+        move_command.set(operational_space_controllers_msgs::MoveConstPtr());
+    }
+    else {
+        move_command.set(command);
+    }
 }
 
 bool ForceController::init(pr2_mechanism_model::RobotState *robot,
