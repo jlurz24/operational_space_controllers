@@ -5,7 +5,7 @@
 #include <pr2_mechanism_model/chain.h>
 #include <pr2_mechanism_model/robot.h>
 
-#include <boost/scoped_ptr.hpp>
+#include <memory> // Added for std::unique_ptr and std::shared_ptr
 #include <kdl/chain.hpp>
 #include <kdl/chainjnttojacsolver.hpp>
 #include <kdl/chainfksolverpos_recursive.hpp>
@@ -43,10 +43,10 @@ namespace operational_space_controllers {
     KDL::Chain kdl_chain;
 
     //! KDL Solver performing the joint angles to Cartesian pose calculation
-    boost::scoped_ptr<KDL::ChainFkSolverPos> jnt_to_pose_solver;
+    std::unique_ptr<KDL::ChainFkSolverPos> jnt_to_pose_solver;
 
     /// KDL Solver performing the joint angles to Jacobian calculation
-    boost::scoped_ptr<KDL::ChainJntToJacSolver> jnt_to_jac_solver;
+    std::unique_ptr<KDL::ChainJntToJacSolver> jnt_to_jac_solver;
 
     //! Joint positions
     KDL::JntArray  q;
@@ -90,10 +90,10 @@ namespace operational_space_controllers {
     KDL::Twist     Kd;
 
     //! State publisher, published every 10 updates
-    boost::scoped_ptr<realtime_tools::RealtimePublisher<operational_space_controllers_msgs::ForceControllerFeedback> > controller_state_publisher;
+    std::unique_ptr<realtime_tools::RealtimePublisher<operational_space_controllers_msgs::ForceControllerFeedback> > controller_state_publisher;
 
     //! Goal
-    realtime_tools::RealtimeBox<boost::shared_ptr<const operational_space_controllers_msgs::Move> > move_command;
+    realtime_tools::RealtimeBox<std::shared_ptr<const operational_space_controllers_msgs::Move> > move_command;
 
     //! Current update count
     int updates;

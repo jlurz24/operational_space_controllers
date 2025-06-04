@@ -2,7 +2,8 @@
 #include <pluginlib/class_list_macros.h>
 #include <string>
 #include <operational_space_controllers_msgs/Move.h>
-#include <boost/math/constants/constants.hpp>
+#include <cmath> // For M_PI
+#include <memory> // For std::shared_ptr
 
 using namespace std;
 using namespace operational_space_controllers;
@@ -10,7 +11,7 @@ using namespace operational_space_controllers;
 /// Register controller to pluginlib
 PLUGINLIB_DECLARE_CLASS(operational_space_controllers,ForceControllerPlugin,operational_space_controllers::ForceController,pr2_controller_interface::Controller)
 
-static const double PI = boost::math::constants::pi<double>();
+static const double PI = M_PI;
 static const double BETA = 20.0 / PI;
 static const double GAMMA = 1e4;
 
@@ -166,7 +167,7 @@ static KDL::Vector dot(const KDL::Rotation& R, const KDL::Vector& V)
 void ForceController::update()
 {
     // Check if there is a current goal
-    boost::shared_ptr<const operational_space_controllers_msgs::Move> move_command_ptr;
+    std::shared_ptr<const operational_space_controllers_msgs::Move> move_command_ptr;
     move_command.get(move_command_ptr);
     updates++;
 
