@@ -1,7 +1,8 @@
+project(force_controller_project) # Added project command
 cmake_minimum_required(VERSION 2.4.6)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
+# include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 
 # Set the build type.  Options are:
 #  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage
@@ -11,8 +12,8 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 #  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
 #set(ROS_BUILD_TYPE RelWithDebInfo)
 
-rosbuild_init()
-rosbuild_check_for_sse()
+# rosbuild_init()
+# rosbuild_check_for_sse()
 
 #set the default path for built executables to the "bin" directory
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
@@ -21,7 +22,8 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 # rosbuild_genmsg()
 
-find_package(Eigen REQUIRED)
+find_package(Eigen3 REQUIRED) # Changed from Eigen to Eigen3
 include_directories(${EIGEN_INCLUDE_DIRS})
+include_directories(include) # Added for local headers
 
-rosbuild_add_library(force_controller src/force_controller.cpp)
+add_library(force_controller src/force_controller.cpp) # Replaced rosbuild_add_library

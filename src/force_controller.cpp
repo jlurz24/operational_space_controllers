@@ -1,11 +1,12 @@
 #include <operational_space_controllers/force_controller.hpp>
 #include <pluginlib/class_list_macros.h>
-#include <string>
+#include <string> // For std::string
 #include <operational_space_controllers_msgs/Move.h>
-#include <cmath> // For M_PI
+#include <cmath> // For M_PI, std::sqrt, std::acos, std::exp
 #include <memory> // For std::shared_ptr
+#include <algorithm> // For std::max
 
-using namespace std;
+// using namespace std; // Removed
 using namespace operational_space_controllers;
 
 /// Register controller to pluginlib
@@ -178,7 +179,7 @@ void ForceController::update()
     // Compute the forward kinematics and Jacobian (at this location)
     jnt_to_pose_solver->JntToCart(q, x);
 
-    if (move_command_ptr.get() != NULL)
+    if (move_command_ptr.get() != nullptr)
     {
         // Determine if this is a torque only command
         if (move_command_ptr->has_torques)
@@ -207,13 +208,26 @@ void ForceController::update()
 
             if (move_command_ptr->point_at_target)
             {
-                double w = KDL::dot(x.p, xd.p);
-                KDL::Vector d = x.p * xd.p;
-                double q = sqrt(1.0 - w * w);
+                KDL::Vector x_p_normalized = x.p;
+                x_p_normalized.Normalize(); // Normalize a copy
+                KDL::Vector xd_p_normalized = xd.p;
+                xd_p_normalized.Normalize(); // Normalize a copy
+
+                double w = KDL::dot(x_p_normalized, xd_p_normalized);
+                w = std::max(-1.0, std::min(1.0, w)); // Clamp w to [-1, 1] just in case of numerical instability
+
+                KDL::Vector d = x_p_normalized % xd_p_normalized; // Use cross product
+
+                double val_for_sqrt = 1.0 - w * w;
+                double q_val = 0.0;
+                if (val_for_sqrt > 0) { // Check before sqrt
+                    q_val = std::sqrt(val_for_sqrt);
+                }
+
                 xd.M = KDL::Rotation::Quaternion(
-                           d.x() * q,
-                           d.y() * q,
-                           d.z() * q,
+                           d.x() * q_val,
+                           d.y() * q_val,
+                           d.z() * q_val,
                            w);
             }
             else
@@ -243,15 +257,25 @@ void ForceController::update()
                 obstacle.p(2) = move_command_ptr->obstacle.position.z;
 
                 // Based on (Hoffmann, 2009)
-                KDL::Rotation R = KDL::Rotation::Rot((obstacle.p - x.p) * xdot.vel, PI / 2.0);
+                KDL::Vector delta_p_obs = obstacle.p - x.p;
+                double delta_p_obs_norm = delta_p_obs.Norm();
+                double xdot_vel_norm = xdot.vel.Norm();
+                const double epsilon = 1e-6; // Small threshold for norm checks
 
-                double phi = acos(KDL::dot(obstacle.p - x.p, xdot.vel) / ((obstacle.p - x.p).Norm() * xdot.vel.Norm()));
-
-                KDL::Vector P = GAMMA * dot(R, xdot.vel) * phi * exp(-BETA * phi);
-
-                for (unsigned int i = 0; i < 3; ++i)
+                if (delta_p_obs_norm > epsilon && xdot_vel_norm > epsilon)
                 {
-                    F(i) += P(i);
+                    KDL::Rotation R = KDL::Rotation::Rot((obstacle.p - x.p) * xdot.vel, PI / 2.0); // Original uses (obstacle.p - x.p)
+
+                    double cos_val = KDL::dot(obstacle.p - x.p, xdot.vel) / (delta_p_obs_norm * xdot_vel_norm);
+                    cos_val = std::max(-1.0, std::min(1.0, cos_val)); // Clamp cos_val to [-1, 1]
+                    double phi = std::acos(cos_val);
+
+                    KDL::Vector P = GAMMA * dot(R, xdot.vel) * phi * std::exp(-BETA * phi);
+
+                    for (unsigned int i = 0; i < 3; ++i)
+                    {
+                        F(i) += P(i);
+                    }
                 }
             }
 
@@ -303,7 +327,7 @@ void ForceController::update()
         controller_state_publisher->msg_.pose_sq_error = pose_sq_err;
         controller_state_publisher->msg_.force_desired_sq = force_desired_sq;
 
-        if(move_command_ptr != NULL)
+        if(move_command_ptr != nullptr)
         {
             controller_state_publisher->msg_.goal.header = move_command_ptr->header;
             controller_state_publisher->msg_.goal.pose = move_command_ptr->target;

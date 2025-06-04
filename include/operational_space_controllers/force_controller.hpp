@@ -108,6 +108,7 @@ namespace operational_space_controllers {
     void commandCB(const operational_space_controllers_msgs::MoveConstPtr &command);
 
   public:
+    virtual ~ForceController() = default;
     /**
      * \brief Controller initialization in non-realtime
      *
