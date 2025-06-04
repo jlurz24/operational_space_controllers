@@ -27,3 +27,8 @@ include_directories(${EIGEN_INCLUDE_DIRS})
 include_directories(include) # Added for local headers
 
 add_library(force_controller src/force_controller.cpp) # Replaced rosbuild_add_library
+
+# Testing
+enable_testing()
+find_package(GTest REQUIRED)
+add_subdirectory(tests)
